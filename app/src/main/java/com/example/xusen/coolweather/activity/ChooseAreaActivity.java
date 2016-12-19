@@ -3,9 +3,12 @@ package com.example.xusen.coolweather.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -49,6 +52,10 @@ public class ChooseAreaActivity extends Activity {
     private CoolWeatherDB coolWeatherDB;
     private List<String> dataList=new ArrayList<String>();
     /**
+     * 是否从WeatherActivity中跳转过来
+     */
+    private boolean isFromWeatherActivity;
+    /**
      * 省列表
      */
     private List<Province> provinceList;
@@ -76,25 +83,21 @@ public class ChooseAreaActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isFromWeatherActivity=getIntent().getBooleanExtra("from_weather_activity",false);
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        //已选择了城市且不是从WeatherActivity跳转过来，才会直接到WeatherActivity
+        if(prefs.getBoolean("city_selected",false)&&!isFromWeatherActivity){
+            Intent intent=new Intent(this,WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.choose_area);
         listView=(ListView)findViewById(R.id.list_view);
         titleText=(TextView)findViewById(R.id.title_text);
         adapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,dataList);
         listView.setAdapter(adapter);
-
-//        // 版本判断。当手机系统大于 23 时，才有必要去判断权限是否获取
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            // 检查该权限是否已经获取
-//            int i = ContextCompat.checkSelfPermission(this, permissions[0]);
-//            // 权限是否已经 授权 GRANTED---授权  DINIED---拒绝
-//            if (i != PackageManager.PERMISSION_GRANTED) {
-//                // 如果没有授予该权限，就去提示用户请求
-//                ActivityCompat.requestPermissions(this,permissions,1);
-//            }
-//        }
-
-
 
         coolWeatherDB=CoolWeatherDB.getInstance(this);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -106,6 +109,12 @@ public class ChooseAreaActivity extends Activity {
                 }else if(currentLevel==LEVEL_CITY){
                     selectedCity=cityList.get(position);
                     queryCounties();
+                }else if(currentLevel==LEVEL_COUNTY){
+                    String countyCode=countyList.get(position).getCountyCode();
+                    Intent intent=new Intent(ChooseAreaActivity.this,WeatherActivity.class);
+                    intent.putExtra("county_code",countyCode);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -247,6 +256,10 @@ public class ChooseAreaActivity extends Activity {
         }else if(currentLevel==LEVEL_CITY){
             queryProvinces();
         }else{
+            if(isFromWeatherActivity){
+                Intent intent=new Intent(this,WeatherActivity.class);
+                startActivity(intent);
+            }
             finish();
         }
     }
