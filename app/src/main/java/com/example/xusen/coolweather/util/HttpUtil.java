@@ -1,5 +1,7 @@
 package com.example.xusen.coolweather.util;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,15 +25,31 @@ public class HttpUtil {
                     connection.setConnectTimeout(8000);
                     connection.setReadTimeout(8000);
                     InputStream in=connection.getInputStream();
-                    BufferedReader reader=new BufferedReader(new InputStreamReader(in));
-                    StringBuilder response=new StringBuilder();
-                    String line;
-                    while((line=reader.readLine())!=null){
-                        response.append(line);
-                    }
+                    InputStreamReader isr=new InputStreamReader(in);
+                    String response;
+                    char []cha=new char[1024];
+                    int len = isr.read(cha);
+                    response=new String(cha,0,len);
+//                    byte b[]=new byte[4096];
+//                    int len=0;
+//                    int temp=0;
+//                    while((temp=in.read())!=-1){
+//                        b[len]=(byte)temp;
+//                        len++;
+//                    }
+//                    String response=new String(b);
+
+//                    BufferedReader reader=new BufferedReader(new InputStreamReader(in));
+//                    StringBuilder response=new StringBuilder();
+//                    String line;
+//                    while((line=reader.readLine())!=null){
+//                        response.append(line);
+//                        Log.d("MainActivity","qqqq:"+response.toString());
+//                    }
+                    Log.d("MainActivity",response);
                     if(listener!=null){
                         //回调onFinish方法
-                        listener.onFinish(response.toString());
+                        listener.onFinish(response);
                     }
                 }catch (Exception e){
                     if(listener!=null){

@@ -161,7 +161,7 @@ public class ChooseAreaActivity extends Activity {
      */
     private void queryCounties(){
         countyList=coolWeatherDB.loadCounties(selectedCity.getId());
-        if(countyList.size()>0){
+            if(countyList.size()>0){
             dataList.clear();
             for(County county:countyList){
                 dataList.add(county.getCountyName());

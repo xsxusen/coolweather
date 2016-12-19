@@ -94,6 +94,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
      */
     private void queryWeatherCode(String countyCode){
         String address="http://www.weather.com.cn/data/list3/city"+countyCode+".xml";
+        Log.d("MainActivity",address);
         queryFromServer(address,"countyCode");
     }
     /**
@@ -101,6 +102,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener{
      */
     private void queryWeatherInfo(String weatherCode){
         String address ="http://www.weather.com.cn/data/cityinfo/"+weatherCode+".html";
+        Log.d("MainActivity",address);
         queryFromServer(address,"weatherCode");
     }
     /**
